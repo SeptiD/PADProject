@@ -1,0 +1,76 @@
+<?php
+    session_start();
+?>
+<head>
+    <!-- Plotly.js -->
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <!-- Numeric JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/numeric/1.2.6/numeric.min.js"></script>
+    <meta http-equiv="refresh" content="30"/>
+</head>
+
+ 
+<body bgcolor="#E6E6FA">
+    <header >
+    <div class="wrapper">
+
+        <?php if (isset($_SESSION['u_id'])):
+            echo '<form class="signout-form" action="includes/signout.inc.php" method="POST">
+                    
+                    <button type="submit" name="signout" ><a>Sign out</a></button>
+
+            </form>'; ?>
+
+        <?php endif; ?>
+         <ul>
+                    <li><a href="charts2.php">Go to map</a></li>
+                    
+        </ul>
+
+    </div>
+</header>
+    <?php
+ 
+        $dbServername = "localhost";
+        $dbUsername = "root";
+        $dbPassword = "";
+        $dbName = "users";
+       
+        $con = mysqli_connect($dbServername, $dbUsername, $dbPassword, $dbName);
+       
+        if (!$con) {
+            die('Could not connect: ' . mysqpli_error($con));
+        }
+       
+        $sql = "SELECT * FROM data";
+        $result = mysqli_query($con, $sql);
+        $resultCheck = mysqli_num_rows($result);
+       
+        if ($resultCheck < 1) {
+            exit();
+        }
+ 
+        $i = 0;
+        $values = array();
+       
+        while($row = mysqli_fetch_array($result)) {
+            $values[$i] = $row['counter'];
+            $i++;
+        }
+ 
+        mysqli_close($con);
+    ?>
+ 
+    <div id="myDiv"><!-- Plotly chart will be drawn inside this DIV --></div>
+    <script>
+        <!-- JAVASCRIPT CODE GOES HERE -->
+        var v = <?php echo json_encode($values); ?>;
+        var data = [{
+                values: v,
+                labels: ['#NFL', '#NBA', '#MLS', '#MLB', '#NHL'],
+                type: 'pie'
+            }];
+ 
+        Plotly.newPlot('myDiv', data);
+    </script>
+</body
